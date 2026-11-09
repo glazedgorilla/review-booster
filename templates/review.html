@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white rounded-2xl shadow p-6 mt-6">
+  <h1 class="text-xl font-bold text-slate-800">How was {{ store or "your visit" }}?</h1>
+
+  <div id="stars" class="flex gap-1 text-4xl mt-4 select-none">
+    {% for i in range(1, 6) %}<span data-v="{{ i }}" class="star cursor-pointer text-slate-300">★</span>{% endfor %}
+  </div>
+
+  <label class="block text-sm font-medium text-slate-700 mt-5">What stood out?</label>
+  <textarea id="notes" rows="3" maxlength="300"
+            placeholder="fast service, iced latte was delicious"
+            class="mt-1 w-full border rounded-lg p-2"></textarea>
+
+  <label class="block text-sm font-medium text-slate-700 mt-4">Tone</label>
+  <select id="tone" class="mt-1 w-full border rounded-lg p-2">
+    {% for t in tones %}<option>{{ t }}</option>{% endfor %}
+  </select>
+
+  <button id="gen" class="w-full mt-5 bg-blue-600 text-white font-semibold rounded-lg py-2 hover:bg-blue-700">
+    ✨ Write my review
+  </button>
+  <p id="err" class="text-red-600 text-sm mt-2"></p>
+
+  <div id="result" class="hidden mt-5">
+    <textarea id="review" rows="5" class="w-full border rounded-lg p-2 bg-slate-50"></textarea>
+    <p class="text-xs text-slate-400 mt-1">You can edit this before posting.</p>
+    <div class="flex gap-2 mt-3">
+      <button id="copy" class="flex-1 bg-slate-800 text-white rounded-lg py-2">📋 Copy</button>
+      <a id="post" href="{{ link }}" target="_blank" rel="noopener"
+         class="flex-1 text-center bg-green-600 text-white rounded-lg py-2">Post on Google</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let rating = 5;
+  const stars = document.querySelectorAll(".star");
+  function paint() {
+    stars.forEach(s => s.classList.toggle("text-yellow-400", +s.dataset.v <= rating));
+    stars.forEach(s => s.classList.toggle("text-slate-300", +s.dataset.v > rating));
+  }
+  stars.forEach(s => s.addEventListener("click", () => { rating = +s.dataset.v; paint(); }));
+  paint();
+
+  async function copyText() {
+    const text = document.getElementById("review").value;
+    try { await navigator.clipboard.writeText(text); }
+    catch { const r = document.getElementById("review"); r.select(); document.execCommand("copy"); }
+  }
+
+  document.getElementById("gen").addEventListener("click", async () => {
+    const btn = document.getElementById("gen"), err = document.getElementById("err");
+    err.textContent = ""; btn.disabled = true; btn.textContent = "Writing...";
+    try {
+      const res = await fetch("/generate", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          rating, store: {{ store|tojson }},
+          notes: document.getElementById("notes").value,
+          tone: document.getElementById("tone").value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      document.getElementById("review").value = data.review;
+      document.getElementById("result").classList.remove("hidden");
+    } catch (e) { err.textContent = e.message; }
+    btn.disabled = false; btn.textContent = "✨ Write my review";
+  });
+
+  document.getElementById("copy").addEventListener("click", async (e) => {
+    await copyText(); e.target.textContent = "✅ Copied!";
+    setTimeout(() => e.target.textContent = "📋 Copy", 1500);
+  });
+  // Copy automatically when they tap "Post on Google" so they can just paste
+  document.getElementById("post").addEventListener("click", copyText);
+</script>
+{% endblock %}

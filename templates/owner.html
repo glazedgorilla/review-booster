@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white rounded-2xl shadow p-6 mt-6">
+  <h1 class="text-2xl font-bold text-slate-800">⭐ Review Booster</h1>
+  <p class="text-slate-500 text-sm mt-1">Create a QR code that helps customers write great Google reviews.</p>
+
+  <form method="post" class="mt-5 space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Store name</label>
+      <input name="store" value="{{ store }}" placeholder="Blue Door Cafe"
+             class="mt-1 w-full border rounded-lg p-2">
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Google Place ID or review URL</label>
+      <input name="place" value="{{ value }}" required placeholder="ChIJ... or https://g.page/r/.../review"
+             class="mt-1 w-full border rounded-lg p-2">
+    </div>
+    {% if error %}<p class="text-red-600 text-sm">{{ error }}</p>{% endif %}
+    <button class="w-full bg-blue-600 text-white font-semibold rounded-lg py-2 hover:bg-blue-700">
+      Generate QR code
+    </button>
+  </form>
+
+  {% if qr %}
+  <div class="mt-6 text-center">
+    <img src="{{ qr }}" alt="QR code" class="mx-auto w-56 h-56 border rounded-lg">
+    <a href="{{ qr }}" download="review-qr.png"
+       class="inline-block mt-3 text-blue-600 font-medium">Download PNG</a>
+    <p class="text-xs text-slate-400 mt-3 break-all">{{ customer_url }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
