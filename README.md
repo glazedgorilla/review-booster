@@ -1,22 +1,23 @@
 # Review Booster
 
-Flask app: store owners make a QR code; customers scan it, rate, add a note, and get an AI-polished Google review (Gemini free tier, with offline mock fallback).
+AI-powered Google review helper. Store owners create a QR code, customers scan it, rate and add a quick note, and Gemini turns it into a polished review. Flask + Gemini free tier, with an offline fallback.
 
-## Run locally
-    python3 -m venv venv
-    source venv/bin/activate        # Windows: venv\Scripts\Activate.ps1
-    pip install -r requirements.txt
-    cp .env.example .env            # add your Gemini key from https://aistudio.google.com/apikey
-    python app.py                   # http://localhost:5050
+**Live demo:** https://YOUR-APP.onrender.com  (may take ~1 minute to wake up)
 
-## Phone testing (free)
-    cloudflared tunnel --url http://localhost:5050
-Open the printed trycloudflare.com URL on your laptop, then generate the QR code there.
+## Run it yourself (free, no credit card)
 
-## Deploy free on Render
-Build: `pip install -r requirements.txt`  |  Start: `gunicorn app:app`
-Env vars: GEMINI_API_KEY, GEMINI_MODELS, PUBLIC_BASE_URL (your onrender.com URL).
+1. Install Python 3.9+
+2. Clone and install:
+       git clone https://github.com/glazedgorilla/review-booster.git
+       cd review-booster
+       python -m venv venv
+       venv\Scripts\activate        (macOS/Linux: source venv/bin/activate)
+       pip install -r requirements.txt
+3. Copy `.env.example` to `.env` and add your own free Gemini API key
+   from https://aistudio.google.com/apikey
+4. Start it: `python app.py`, then open http://localhost:5050
 
-## Notes
-- If reviews show source "mock", run `python check_models.py` and update GEMINI_MODELS.
-- Only post reviews reflecting genuine customer experiences (Google policy).
+No key? It still works with mock reviews.
+
+## Tech
+Python, Flask, Gemini API, qrcode + Pillow, Tailwind CSS
