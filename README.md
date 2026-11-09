@@ -2,7 +2,7 @@
 
 AI-powered Google review helper. Store owners create a QR code, customers scan it, rate and add a quick note, and Gemini turns it into a polished review. Flask + Gemini free tier, with an offline fallback.
 
-**Live demo:** https://YOUR-APP.onrender.com  (may take ~1 minute to wake up)
+**Live demo:** (https://review-booster-m0b1.onrender.com)  (may take ~1 minute to wake up)
 
 ## Run it yourself (free, no credit card)
 
